@@ -57,10 +57,6 @@ export default function Layout() {
             <span className="module-num">⌂</span>
             Home
           </NavLink>
-          <NavLink to="/about" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
-            <span className="module-num">?</span>
-            About
-          </NavLink>
           {modules.map((m) => (
             <NavLink
               key={m.id}
@@ -71,6 +67,10 @@ export default function Layout() {
               {m.title}
             </NavLink>
           ))}
+          <NavLink to="/about" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
+            <span className="module-num">?</span>
+            About
+          </NavLink>
           <hr className="sidebar-divider" />
           <NavLink to="/community" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
             <span className="module-num">✦</span>
