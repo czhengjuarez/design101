@@ -68,6 +68,15 @@ export default function Layout() {
             </NavLink>
           ))}
           <hr className="sidebar-divider" />
+          <NavLink to="/community" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
+            <span className="module-num">✦</span>
+            Community
+          </NavLink>
+          <NavLink to="/share" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
+            <span className="module-num">↑</span>
+            Share your teaching
+          </NavLink>
+          <hr className="sidebar-divider" />
           <NavLink to="/about" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
             <span className="module-num">?</span>
             About

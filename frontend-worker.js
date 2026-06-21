@@ -180,6 +180,71 @@ async function handleUpdateSuggestion(key, request, env) {
   return json({ success: true, item: updated });
 }
 
+// ── Community — R2 image + JSON store ────────────────────
+// Posts live at: community/{id}/meta.json + community/{id}/image
+
+async function handleCreateCommunityPost(request, env) {
+  if (!env.DATA) return json({ error: 'R2 not bound' }, 503);
+
+  let formData;
+  try { formData = await request.formData(); } catch { return json({ error: 'Expected multipart/form-data' }, 400); }
+
+  const title = formData.get('title')?.toString().trim();
+  const description = formData.get('description')?.toString().trim();
+  if (!title || !description) return json({ error: 'Missing required fields: title, description' }, 400);
+
+  const name = formData.get('name')?.toString().trim() || null;
+  const contact = formData.get('contact')?.toString().trim() || null;
+  const image = formData.get('image');
+
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+
+  let imageContentType = null;
+  if (image && typeof image === 'object' && image.size > 0) {
+    imageContentType = image.type || 'image/jpeg';
+    const buffer = await image.arrayBuffer();
+    await env.DATA.put(`community/${id}/image`, buffer, { httpMetadata: { contentType: imageContentType } });
+  }
+
+  const meta = { id, title, description, name, contact, hasImage: !!imageContentType, imageContentType, submitted_at: new Date().toISOString() };
+  await env.DATA.put(`community/${id}/meta.json`, JSON.stringify(meta), { httpMetadata: { contentType: 'application/json' } });
+
+  return json({ success: true, id }, 201);
+}
+
+async function handleListCommunityPosts(env) {
+  if (!env.DATA) return json({ posts: [] });
+  const list = await env.DATA.list({ prefix: 'community/' });
+  const metaKeys = list.objects.filter((o) => o.key.endsWith('/meta.json'));
+  const posts = await Promise.all(
+    metaKeys.map(async (obj) => {
+      const r = await env.DATA.get(obj.key);
+      return r ? JSON.parse(await r.text()) : null;
+    })
+  );
+  return json({ posts: posts.filter(Boolean).sort((a, b) => b.submitted_at.localeCompare(a.submitted_at)) });
+}
+
+async function handleGetCommunityImage(id, env) {
+  if (!env.DATA) return new Response('Not found', { status: 404 });
+  const obj = await env.DATA.get(`community/${id}/image`);
+  if (!obj) return new Response('Not found', { status: 404 });
+  const headers = new Headers();
+  obj.writeHttpMetadata(headers);
+  headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+  return new Response(obj.body, { headers });
+}
+
+async function handleDeleteCommunityPost(id, request, env) {
+  if (!verifyAdmin(request, env)) return json({ error: 'Unauthorized' }, 401);
+  if (!env.DATA) return json({ error: 'R2 not bound' }, 503);
+  await Promise.all([
+    env.DATA.delete(`community/${id}/meta.json`),
+    env.DATA.delete(`community/${id}/image`),
+  ]);
+  return json({ success: true });
+}
+
 // ── Entry ────────────────────────────────────────────────
 export default {
   async fetch(request, env, ctx) {
@@ -196,6 +261,13 @@ export default {
         const suggestMatch = path.match(/^\/api\/admin\/suggestions\/([^/]+)$/);
         if (suggestMatch && request.method === 'DELETE') return handleDeleteSuggestion(suggestMatch[1], request, env);
         if (suggestMatch && request.method === 'PATCH') return handleUpdateSuggestion(suggestMatch[1], request, env);
+        // Community posts
+        if (path === '/api/community' && request.method === 'POST') return handleCreateCommunityPost(request, env);
+        if (path === '/api/community' && request.method === 'GET') return handleListCommunityPosts(env);
+        const communityImageMatch = path.match(/^\/api\/community\/([^/]+)\/image$/);
+        if (communityImageMatch && request.method === 'GET') return handleGetCommunityImage(communityImageMatch[1], env);
+        const communityDeleteMatch = path.match(/^\/api\/admin\/community\/([^/]+)$/);
+        if (communityDeleteMatch && request.method === 'DELETE') return handleDeleteCommunityPost(communityDeleteMatch[1], request, env);
         return json({ error: 'Not found' }, 404);
       } catch (err) {
         console.error('API error:', err);

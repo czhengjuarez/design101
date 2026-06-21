@@ -50,6 +50,51 @@ export default function Admin() {
         </button>
       </div>
       <SuggestionsPanel adminKey={key} />
+      <div style={{ marginTop: 'var(--of-space-12)', borderTop: '1px solid var(--of-border-subtle)', paddingTop: 'var(--of-space-8)' }}>
+        <CommunityPanel adminKey={key} />
+      </div>
+    </div>
+  );
+}
+
+function CommunityPanel({ adminKey }: { adminKey: string }) {
+  const [posts, setPosts] = useState<{ id: string; title: string; name: string | null; submitted_at: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/community')
+      .then((r) => r.json())
+      .then((d) => { setPosts(d.posts || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  async function remove(id: string) {
+    await fetch(`/api/admin/community/${id}`, { method: 'DELETE', headers: { 'X-Admin-Key': adminKey } });
+    setPosts((p) => p.filter((x) => x.id !== id));
+  }
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 'var(--of-text-lg)', marginBottom: 'var(--of-space-5)' }}>
+        Community posts <span className="badge badge--arc">{posts.length}</span>
+      </h2>
+      {loading && <p style={{ color: 'var(--of-fg-subtle)' }}>Loading…</p>}
+      {!loading && posts.length === 0 && <p style={{ color: 'var(--of-fg-subtle)' }}>No posts yet.</p>}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--of-space-3)' }}>
+        {posts.map((p) => (
+          <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--of-space-4)', border: '1px solid var(--of-border-line)', borderRadius: 'var(--of-radius-md)', background: 'var(--of-bg-elevated)' }}>
+            <div>
+              <p style={{ fontWeight: 600, marginBottom: 2 }}>{p.title}</p>
+              <p style={{ fontSize: 'var(--of-text-xs)', color: 'var(--of-fg-subtle)' }}>
+                {p.name || 'Anonymous'} · {new Date(p.submitted_at).toLocaleDateString()}
+              </p>
+            </div>
+            <button type="button" style={{ fontSize: 'var(--of-text-sm)', color: 'var(--of-fg-danger)', background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--of-space-2)' }} onClick={() => remove(p.id)}>
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

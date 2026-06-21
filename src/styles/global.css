@@ -549,6 +549,77 @@ code, pre { font-family: var(--of-font-mono); }
 .suggest-success-body { color: var(--of-fg-muted); margin: 0; }
 
 /* ============================================================
+   Share — image dropzone
+   ============================================================ */
+.share-dropzone {
+  border: 2px dashed var(--of-border-line);
+  border-radius: var(--of-radius-lg);
+  background: var(--of-bg-recessed);
+  cursor: pointer;
+  transition: border-color var(--of-dur-fast), background var(--of-dur-fast);
+  overflow: hidden;
+}
+.share-dropzone:hover, .share-dropzone:focus-visible { border-color: var(--of-border-brand); background: var(--of-bg-brand-tint); outline: none; }
+.share-dropzone--over { border-color: var(--of-border-brand); background: var(--of-bg-brand-tint); }
+.share-dropzone--has-image { cursor: default; border-style: solid; border-color: var(--of-border-line); }
+.share-dropzone-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--of-space-3); padding: var(--of-space-10) var(--of-space-6); text-align: center; }
+.share-dropzone-icon { font-size: 2rem; }
+.share-dropzone-label { font-size: var(--of-text-base); font-weight: 500; color: var(--of-fg-default); }
+.share-dropzone-hint { font-size: var(--of-text-xs); color: var(--of-fg-subtle); }
+.share-preview-wrap { position: relative; }
+.share-preview-img { display: block; width: 100%; max-height: 360px; object-fit: contain; background: var(--of-bg-sunken); }
+.share-preview-remove { position: absolute; top: var(--of-space-3); right: var(--of-space-3); width: 32px; height: 32px; border-radius: var(--of-radius-md); background: var(--of-bg-elevated); border: 1px solid var(--of-border-line); cursor: pointer; color: var(--of-fg-muted); font-size: var(--of-text-sm); }
+.share-preview-remove:hover { color: var(--of-fg-danger); border-color: var(--of-fg-danger); }
+
+/* ============================================================
+   Community gallery
+   ============================================================ */
+.community-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: var(--of-space-8); margin-bottom: var(--of-space-10);
+}
+.community-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 320px; text-align: center;
+  border: 1px dashed var(--of-border-line); border-radius: var(--of-radius-xl);
+  padding: var(--of-space-12);
+}
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--of-space-5);
+  align-items: start;
+}
+.community-card {
+  border: 1px solid var(--of-border-line);
+  border-radius: var(--of-radius-lg);
+  background: var(--of-bg-elevated);
+  overflow: hidden;
+  transition: border-color var(--of-dur-fast), box-shadow var(--of-dur-fast);
+}
+.community-card:hover { border-color: var(--of-border-brand); box-shadow: var(--of-shadow-sm); }
+.community-card-image-wrap { background: var(--of-bg-sunken); }
+.community-card-image { display: block; width: 100%; max-height: 240px; object-fit: cover; }
+.community-card-body { padding: var(--of-space-5); display: flex; flex-direction: column; gap: var(--of-space-3); }
+.community-card-title { font-size: var(--of-text-md); font-weight: 600; line-height: var(--of-leading-snug); }
+.community-card-desc {
+  font-size: var(--of-text-sm); color: var(--of-fg-muted); line-height: var(--of-leading-normal);
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.community-card-desc--open { display: block; -webkit-line-clamp: unset; }
+.community-card-toggle { font-size: var(--of-text-xs); color: var(--of-fg-brand); background: none; border: none; cursor: pointer; padding: 0; font-weight: 600; }
+.community-card-footer { display: flex; align-items: center; justify-content: space-between; gap: var(--of-space-3); padding-top: var(--of-space-3); border-top: 1px solid var(--of-border-subtle); }
+.community-card-author { display: flex; flex-direction: column; gap: 2px; }
+.community-card-name { font-size: var(--of-text-xs); font-weight: 600; color: var(--of-fg-default); }
+.community-card-contact { font-size: var(--of-text-xs); color: var(--of-fg-brand); }
+.community-card-date { font-size: var(--of-text-xs); color: var(--of-fg-subtle); white-space: nowrap; }
+
+@media (max-width: 860px) {
+  .community-header { flex-direction: column; gap: var(--of-space-5); }
+  .community-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
    Admin — suggestion cards
    ============================================================ */
 .suggestion-card {
