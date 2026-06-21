@@ -188,7 +188,7 @@ code, pre { font-family: var(--of-font-mono); }
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.hero .lede { font-size: var(--of-text-lg); color: var(--of-fg-muted); max-width: 60ch; line-height: var(--of-leading-relaxed); }
+.hero .lede { font-size: var(--of-text-lg); color: var(--of-fg-muted); line-height: var(--of-leading-relaxed); }
 
 .hero-quote {
   margin-top: var(--of-space-8);
@@ -196,7 +196,6 @@ code, pre { font-family: var(--of-font-mono); }
   border-left: 3px solid var(--of-border-brand);
   background: var(--of-bg-brand-tint);
   border-radius: 0 var(--of-radius-md) var(--of-radius-md) 0;
-  max-width: 60ch;
 }
 .hero-quote p { font-size: var(--of-text-md); color: var(--of-fg-default); font-style: italic; margin: 0 0 var(--of-space-2); }
 .hero-quote cite { font-size: var(--of-text-xs); color: var(--of-fg-subtle); text-transform: uppercase; letter-spacing: var(--of-tracking-wide); font-style: normal; }
