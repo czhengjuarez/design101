@@ -1,0 +1,23 @@
+name = "design101"
+main = "frontend-worker.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "d6ff2f0914adb1d9faae77870fadb7cc"
+workers_dev = true
+
+[site]
+bucket = "./dist"
+
+# ── Workers AI (the tutor) ───────────────────────────────
+# No resource to create — binding is available once AI is enabled on the account.
+[ai]
+binding = "AI"
+
+# ── R2: suggestions + future approved community resources ─
+[[r2_buckets]]
+binding = "DATA"
+bucket_name = "design101-data"
+
+[vars]
+CATALOG_BASE = "https://design-resources.coscient.workers.dev"
+# ADMIN_PASSPHRASE removed — using the encrypted `passphrase` secret set in the dashboard.
