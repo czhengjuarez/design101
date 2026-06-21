@@ -18,7 +18,7 @@ Owner: czhengjuarez / changying@coscient.com
 - **Frontend:** React 18 + TypeScript + Vite 6
 - **Design system:** Keel `--of-*` tokens (github.com/czhengjuarez/Keel)
 - **AI:** Cloudflare Workers AI — `@cf/meta/llama-3.3-70b-instruct-fp8-fast`
-- **Storage:** R2 bucket `design101-data` (suggestions JSON)
+- **Storage:** R2 bucket `design101-data` (community posts + suggestions JSON/binary)
 - **Auth:** `passphrase` secret on the Worker (Cloudflare dashboard), checked via `X-Admin-Key` header
 
 ## Key commands
@@ -43,7 +43,10 @@ npm run deploy       # build + wrangler deploy
 | `src/styles/tokens.css` | Full Keel token set. Do not edit values — source from github.com/czhengjuarez/Keel. |
 | `src/styles/global.css` | App styles built on tokens. |
 | `src/components/DownloadCurriculum.tsx` | Client-side markdown export of a module's slides + resources + books. |
-| `src/pages/Admin.tsx` | Passphrase-gated suggestion review panel. |
+| `src/pages/Community.tsx` | Gallery of community teaching posts loaded from R2. |
+| `src/pages/Share.tsx` | Submit a community post — image upload/paste + description form. |
+| `src/pages/Suggest.tsx` | Suggest a resource for a module (no image, just URL + metadata). |
+| `src/pages/Admin.tsx` | Passphrase-gated panel: review suggestions + moderate community posts. |
 
 ---
 
@@ -75,12 +78,16 @@ Slide types: `titleSlide`, `body`, `bullets`, `quote`, `highlight`, `split`, `im
 ## API routes
 
 ```
-POST /api/ask                        AI tutor — { moduleId, question, history }
-GET  /api/resources                  Catalog proxy (design-resources.coscient.workers.dev)
-POST /api/suggestions                Submit suggestion → R2
-GET  /api/admin/suggestions          List R2 suggestions [X-Admin-Key required]
-PATCH /api/admin/suggestions/:id     Update status [X-Admin-Key required]
-DELETE /api/admin/suggestions/:id    Delete [X-Admin-Key required]
+POST   /api/ask                        AI tutor — { moduleId, question, history }
+GET    /api/resources                  Catalog proxy (design-resources.coscient.workers.dev)
+POST   /api/community                  Submit community post (multipart: image + metadata) → R2
+GET    /api/community                  List community posts (metadata only)
+GET    /api/community/:id/image        Serve post image from R2 (immutable cache)
+DELETE /api/admin/community/:id        Delete community post [X-Admin-Key required]
+POST   /api/suggestions                Submit resource suggestion → R2
+GET    /api/admin/suggestions          List R2 suggestions [X-Admin-Key required]
+PATCH  /api/admin/suggestions/:id      Update status [X-Admin-Key required]
+DELETE /api/admin/suggestions/:id      Delete [X-Admin-Key required]
 ```
 
 ---
@@ -112,7 +119,20 @@ curl https://design101.coscient.workers.dev/api/admin/suggestions \
   -H "X-Admin-Key: <passphrase>"
 ```
 
-### 3. Curriculum update agent
+### 3. Community moderation agent
+
+Reads community posts from R2, checks for off-topic or inappropriate content, and flags or deletes as needed.
+
+```bash
+# List all community posts
+curl https://design101.coscient.workers.dev/api/community
+
+# Delete a post
+curl -X DELETE https://design101.coscient.workers.dev/api/admin/community/<id> \
+  -H "X-Admin-Key: <passphrase>"
+```
+
+### 4. Curriculum update agent
 
 Given a URL or article, an agent can:
 - Fetch and summarize the content
@@ -120,14 +140,14 @@ Given a URL or article, an agent can:
 - Propose a new `Resource` or `BookSuggestion` entry formatted for `modules.ts`
 - Open a PR on `github.com/czhengjuarez/design101`
 
-### 4. New module drafter
+### 5. New module drafter
 
 An agent given a topic (e.g. "Motion Design" or "Data Visualization") can:
 - Draft a new `Module` object following the existing content model
 - Generate slides using the established patterns (overview → 3 deep-dives per concept)
 - Add to `modules.ts` and open a PR
 
-### 5. Tutor corpus sync
+### 6. Tutor corpus sync
 
 When `modules.ts` changes significantly, `worker/curriculum.js` needs updating. An agent can:
 - Diff `modules.ts` against the last known state
@@ -144,7 +164,11 @@ When `modules.ts` changes significantly, `worker/curriculum.js` needs updating. 
 
 3. **curriculum.js must stay in sync** — The AI tutor answers from `curriculum.js`, not from `modules.ts` at runtime. When slides change substantially, update `worker/curriculum.js` too or the tutor will give outdated answers.
 
-4. **R2 for suggestions, not D1** — The project has no D1 database. Suggestions are R2 JSON files. The migration in `migrations/` is a leftover stub — ignore it.
+4. **R2 for everything, no D1** — The project has no D1 database. All community and suggestion data is in R2 (`design101-data` bucket). R2 structure:
+   - `suggestions/{iso-rand}.json` — one file per resource suggestion
+   - `community/{id}/meta.json` — community post metadata
+   - `community/{id}/image` — binary image file
+   The migration in `migrations/` is a leftover stub — ignore it.
 
 5. **Admin passphrase is a Worker secret** — Set in the Cloudflare dashboard as `passphrase` (encrypted). It is not in `wrangler.toml` or the repo. Never commit it.
 

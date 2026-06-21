@@ -38,7 +38,7 @@ No deliverables, no submissions. Three formats:
 | Styling | **Keel** `--of-*` design tokens — `github.com/czhengjuarez/Keel` |
 | Backend | Single Cloudflare Worker (`frontend-worker.js`) — serves SPA + all API routes |
 | AI tutor | **Cloudflare Workers AI** — `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
-| Suggestions | **R2** (`design101-data` bucket) — one JSON file per submission, no schema |
+| Community + Suggestions | **R2** (`design101-data` bucket) — JSON + binary, no schema |
 | Content | Typed `src/data/modules.ts` — no CMS, version-controlled |
 | Deployment | Cloudflare Workers (account: ChangyingArts) |
 
@@ -55,8 +55,8 @@ design101/
 │   ├── data/
 │   │   └── modules.ts      # All curriculum content — 5 modules, typed
 │   ├── components/
-│   │   ├── Layout.tsx       # Sidebar nav + theme toggle
-│   │   ├── SlideDeck.tsx    # Keyboard + fullscreen slide viewer
+│   │   ├── Layout.tsx            # Sidebar nav + theme toggle
+│   │   ├── SlideDeck.tsx         # Keyboard + fullscreen slide viewer
 │   │   ├── CritiqueExercise.tsx  # "Spot the issue" reveal component
 │   │   ├── DecisionDrill.tsx     # Ship/fix/escalate judgment drill
 │   │   ├── AskTutor.tsx          # Workers AI chat panel
@@ -64,16 +64,16 @@ design101/
 │   ├── pages/
 │   │   ├── Home.tsx         # Module grid + teaching philosophy
 │   │   ├── ModulePage.tsx   # Tabbed module view + prev/next nav
-│   │   ├── Suggest.tsx      # Community resource suggestion form
-│   │   ├── Admin.tsx        # Passphrase-gated suggestions review
+│   │   ├── Community.tsx    # Gallery of community teaching posts
+│   │   ├── Share.tsx        # Submit a teaching post (image + description)
+│   │   ├── Suggest.tsx      # Suggest a resource for a module
+│   │   ├── Admin.tsx        # Passphrase-gated suggestions + community moderation
 │   │   └── About.tsx        # Course philosophy
 │   └── styles/
 │       ├── tokens.css       # Keel --of-* design tokens (full set)
 │       └── global.css       # App styles built on tokens
 ├── public/
 │   └── favicon.svg          # Lucide book-open icon, Keel magenta gradient
-├── migrations/
-│   └── 0001_create_suggestions.sql  # D1 schema (not active — using R2)
 └── wrangler.toml
 ```
 
@@ -85,6 +85,10 @@ design101/
 |---|---|---|---|
 | `POST` | `/api/ask` | public | AI tutor. Body: `{ moduleId, question, history }` → `{ answer, citations }` |
 | `GET` | `/api/resources` | public | Cached proxy of design-resources catalog |
+| `POST` | `/api/community` | public | Submit a community post (multipart: image + metadata) → R2 |
+| `GET` | `/api/community` | public | List all community posts (metadata only) |
+| `GET` | `/api/community/:id/image` | public | Serve a community post image from R2 |
+| `DELETE` | `/api/admin/community/:id` | `X-Admin-Key` | Delete a community post |
 | `POST` | `/api/suggestions` | public | Submit a resource suggestion → R2 |
 | `GET` | `/api/admin/suggestions` | `X-Admin-Key` | List all suggestions from R2 |
 | `PATCH` | `/api/admin/suggestions/:id` | `X-Admin-Key` | Update suggestion status |
@@ -151,9 +155,28 @@ books: [
 
 ---
 
+## Community space
+
+The `/community` page is an open gallery for anyone who has taught — or is teaching — design craft to non-designers. Posts are not limited to this curriculum; anyone sharing the practice is welcome.
+
+### Submitting a post (`/share`)
+
+- **Image** — drag-and-drop, click to browse, or paste directly from clipboard (`Cmd+V`)
+- **Title** — what you taught or the context (required)
+- **Description** — what happened, what worked, what surprised you (required)
+- **Name + contact** — optional; if provided, a "Get in touch" link appears on the card so others can reach the author
+
+Each post writes two R2 objects to `design101-data`:
+- `community/{id}/meta.json` — title, description, name, contact, timestamp
+- `community/{id}/image` — binary image served with immutable cache headers
+
+Posts are open — no approval step. Admins can delete from `/admin` if needed.
+
+---
+
 ## Suggestions workflow
 
-Community members submit suggestions at `/suggest`. Each submission writes a JSON file to R2 (`design101-data` bucket, `suggestions/` prefix). The admin reviews at `/admin` (passphrase: set in Cloudflare dashboard as the `passphrase` secret). Approved suggestions are manually added to `modules.ts`.
+Community members suggest resources at `/suggest`. Each submission writes a JSON file to R2 (`design101-data` bucket, `suggestions/` prefix). The admin reviews at `/admin` (passphrase: set in Cloudflare dashboard as the `passphrase` secret). Approved suggestions are manually added to `modules.ts`.
 
 ---
 
