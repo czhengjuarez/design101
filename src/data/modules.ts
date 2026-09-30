@@ -1427,6 +1427,7 @@ export const modules: Module[] = [
     ],
     resources: [
       { title: 'A Primer to OOUX', url: 'https://www.smashingmagazine.com/2020/10/object-oriented-ux/', type: 'article', description: "Sophia Prater's intro to object-oriented UX." },
+      { title: 'OOUX Resources', url: 'https://ooux.com/resources', type: 'framework', description: "Sophia Prater's OOUX library: guides, templates, and the ORCA process." },
       { title: 'OOUX: ORCA Process', url: 'https://www.ooux.com/', type: 'framework', description: 'The canonical methodology home.' },
       { title: 'Information Architecture (IxDF)', url: 'https://www.interaction-design.org/literature/topics/information-architecture', type: 'course', description: 'IA foundations behind OOUX.' },
     ],
