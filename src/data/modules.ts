@@ -1430,7 +1430,7 @@ export const modules: Module[] = [
       { title: 'Information Architecture (IxDF)', url: 'https://www.interaction-design.org/literature/topics/information-architecture', type: 'course', description: 'IA foundations behind OOUX.' },
     ],
     books: [
-      { title: 'A Practical Guide to Information Architecture', author: 'Donna Spencer', url: 'https://www.google.com/search?q=A+Practical+Guide+to+Information+Architecture', thumbnailUrl: 'https://covers.openlibrary.org/b/isbn/9780955617904-L.jpg', note: 'Approachable IA grounding for OOUX.', topPick: true },
+      { title: 'A Practical Guide to Information Architecture', author: 'Donna Spencer', url: 'https://maadmob.com.au/wp-content/uploads/2021/03/PracticalGuideToInformationArchitecture.pdf', thumbnailUrl: 'https://covers.openlibrary.org/b/id/7904329-L.jpg', note: 'Approachable IA grounding for OOUX.', topPick: true },
       { title: 'How to Make Sense of Any Mess', author: 'Abby Covert', url: 'https://www.google.com/search?q=How+to+Make+Sense+of+Any+Mess', thumbnailUrl: 'https://covers.openlibrary.org/b/isbn/9781500615994-L.jpg', note: 'Short, sharp IA thinking.' },
     ],
     practice: {
