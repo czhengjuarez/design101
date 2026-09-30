@@ -1222,8 +1222,9 @@ export const modules: Module[] = [
       { title: 'The Re-Wired Group: Switch Interview', url: 'https://www.youtube.com/results?search_query=bob+moesta+switch+interview', type: 'video', description: 'Bob Moesta on uncovering the real job.' },
     ],
     books: [
-      { title: 'Competing Against Luck', author: 'Clayton Christensen', url: 'https://www.google.com/search?q=Competing+Against+Luck', thumbnailUrl: 'https://covers.openlibrary.org/b/isbn/9780062382801-L.jpg', note: 'The original JTBD theory.', topPick: true },
-      { title: 'When Coffee and Kale Compete', author: 'Alan Klement', url: 'https://www.google.com/search?q=When+Coffee+and+Kale+Compete', note: 'JTBD applied to product, free online.' },
+      { title: 'The Jobs To Be Done Playbook', author: 'Jim Kalbach', url: 'https://rosenfeldmedia.com/books/jobs-to-be-done-book/', thumbnailUrl: 'https://covers.openlibrary.org/b/id/10085437-L.jpg', note: 'Align your markets, organization, and strategy around customer needs.', topPick: true },
+      { title: 'Competing Against Luck', author: 'Clayton Christensen', url: 'https://www.google.com/search?q=Competing+Against+Luck', thumbnailUrl: 'https://covers.openlibrary.org/b/isbn/9780062382801-L.jpg', note: 'The original JTBD theory.' },
+      { title: 'When Coffee and Kale Compete', author: 'Alan Klement', url: 'https://www.goodreads.com/book/show/39829362-when-coffee-and-kale-compete', thumbnailUrl: 'https://books.google.com/books/content?vid=ISBN9781534873063&printsec=frontcover&img=1&zoom=1', note: 'JTBD applied to product, free online.' },
       { title: 'Demand-Side Sales 101', author: 'Bob Moesta', url: 'https://www.google.com/search?q=Demand-Side+Sales+101+Bob+Moesta', thumbnailUrl: 'https://covers.openlibrary.org/b/isbn/9781544509969-L.jpg', note: 'The forces and the switch, from the source.' },
     ],
     practice: {
