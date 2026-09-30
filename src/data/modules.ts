@@ -545,7 +545,7 @@ export const modules: Module[] = [
     ],
     books: [
       { title: "The Non-Designer's Design Book", author: 'Robin Williams', url: 'https://www.google.com/search?q=The+Non-Designer%27s+Design+Book', thumbnailUrl: 'https://covers.openlibrary.org/b/isbn/9780133966152-L.jpg', note: 'C.R.A.P: Contrast, Repetition, Alignment, Proximity. The canonical starting point.', topPick: true },
-      { title: 'Refactoring UI', author: 'Adam Wathan & Steve Schoger', url: 'https://www.refactoringui.com/', thumbnailUrl: 'https://covers.openlibrary.org/b/isbn/9780578318820-L.jpg', note: 'Practical, tactical visual design for non-designers who ship.' },
+      { title: 'Refactoring UI', author: 'Adam Wathan & Steve Schoger', url: 'https://www.refactoringui.com/', thumbnailUrl: 'https://covers.openlibrary.org/b/id/10527062-L.jpg', note: 'Practical, tactical visual design for non-designers who ship.' },
       { title: 'Thinking with Type', author: 'Ellen Lupton', url: 'https://www.google.com/search?q=Thinking+with+Type+Ellen+Lupton', thumbnailUrl: 'https://covers.openlibrary.org/b/isbn/9781568989693-L.jpg', note: 'Typography fundamentals, readable and applied.' },
     ],
     practice: {
