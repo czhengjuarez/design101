@@ -563,7 +563,7 @@ code, pre { font-family: var(--of-font-mono); }
 .share-dropzone--over { border-color: var(--of-border-brand); background: var(--of-bg-brand-tint); }
 .share-dropzone--has-image { cursor: default; border-style: solid; border-color: var(--of-border-line); }
 .share-dropzone-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--of-space-3); padding: var(--of-space-10) var(--of-space-6); text-align: center; }
-.share-dropzone-icon { font-size: 2rem; }
+.share-dropzone-icon { display: flex; color: var(--of-fg-subtle); }
 .share-dropzone-label { font-size: var(--of-text-base); font-weight: 500; color: var(--of-fg-default); }
 .share-dropzone-hint { font-size: var(--of-text-xs); color: var(--of-fg-subtle); }
 .share-preview-wrap { position: relative; }

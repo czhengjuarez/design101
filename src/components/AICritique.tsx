@@ -1,3 +1,4 @@
+import ImageIcon from './ImageIcon';
 import { useState, useRef, useCallback } from 'react';
 
 type Status = 'idle' | 'sending' | 'done' | 'error';
@@ -141,7 +142,7 @@ export default function AICritique() {
             </div>
           ) : (
             <div className="share-dropzone-inner">
-              <div className="share-dropzone-icon">🖼</div>
+              <div className="share-dropzone-icon"><ImageIcon /></div>
               <p className="share-dropzone-label">Drop a screenshot, click to browse, or paste from clipboard</p>
               <p className="share-dropzone-hint">Use a screen you own. Don't include customer data or secrets.</p>
             </div>

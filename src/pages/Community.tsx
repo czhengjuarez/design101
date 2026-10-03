@@ -62,7 +62,15 @@ export default function Community() {
 
       {!loading && posts.length === 0 && (
         <div className="community-empty">
-          <p style={{ fontSize: 'var(--of-text-2xl)', marginBottom: 'var(--of-space-4)' }}>🌱</p>
+          <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--of-fg-subtle)', marginBottom: 'var(--of-space-4)' }}>
+            {/* Lucide "sprout" */}
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M7 20h10" />
+              <path d="M10 20c5.5-2.5.8-6.4 3-10" />
+              <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+              <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z" />
+            </svg>
+          </div>
           <p style={{ fontSize: 'var(--of-text-lg)', fontWeight: 600, marginBottom: 'var(--of-space-2)' }}>Nothing here yet.</p>
           <p style={{ color: 'var(--of-fg-muted)', marginBottom: 'var(--of-space-6)' }}>
             Be the first to share what happened when you taught design to non-designers.
