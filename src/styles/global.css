@@ -680,3 +680,7 @@ code, pre { font-family: var(--of-font-mono); }
   .arc-strip { gap: var(--of-space-1); }
   .module-grid { grid-template-columns: 1fr; }
 }
+
+/* AI critique result (Module 1 practice) */
+.ai-critique-result { background: var(--of-bg-recessed); color: var(--of-fg-default); line-height: var(--of-leading-relaxed); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -79,6 +79,7 @@ Slide types: `titleSlide`, `body`, `bullets`, `quote`, `highlight`, `split`, `im
 
 ```
 POST   /api/ask                        AI tutor — { moduleId, question, history }
+POST   /api/critique                   Module 1 screenshot critique (vision) — { image (data URL), intent }; 10/hr/IP
 GET    /api/resources                  Catalog proxy (design-resources.coscient.workers.dev)
 POST   /api/community                  Submit community post (multipart: image + metadata) → R2
 GET    /api/community                  List community posts (metadata only)

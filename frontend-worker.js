@@ -7,6 +7,8 @@ const assetManifest = JSON.parse(manifestJSON);
 // Workers AI text model. Swap freely — verify the current best instruct model in
 // the Cloudflare dashboard. 8b is cheaper/faster; 70b is stronger for tutoring.
 const AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+// Vision model for the Module 1 screenshot critique.
+const VISION_MODEL = '@cf/meta/llama-3.2-11b-vision-instruct';
 
 // ── Helpers ──────────────────────────────────────────────
 function json(data, status = 200) {
@@ -104,6 +106,107 @@ async function handleAsk(request, env) {
     const out = await env.AI.run(AI_MODEL, { messages, max_tokens: 700, temperature: 0.4 });
     const answer = (out && (out.response ?? out.result?.response)) || 'No answer.';
     return json({ answer: String(answer).trim(), citations });
+  } catch (err) {
+    return json({ error: 'AI request failed', detail: String(err) }, 502);
+  }
+}
+
+// ── /api/critique — Module 1 screenshot critique (vision) ─
+const CRITIQUE_SYSTEM = `You are the critique partner for Module 1 of "Design 101" (Design Craft: How to See), teaching non-designers to critique UI with named principles instead of preference.
+
+Critique the screenshot using ONLY this module's vocabulary:
+- Visual hierarchy: scanning order, and the four levers (size, weight, contrast, position). Flat hierarchy = nothing lands.
+- Typography: line length, weight creating hierarchy, too many families/sizes.
+- Color: contrast as an accessibility floor, semantic color (error red, success green), color doing undefined work.
+- Spacing & layout: proximity groups related things, whitespace is structure, a consistent spacing scale.
+- Gestalt: similarity, closure, continuity, figure/ground.
+
+Answer with exactly these four headings, each on its own line followed by its content:
+
+What it is trying to do
+(one sentence; use the learner's stated intent and say whether the screen supports it)
+
+Does it do that?
+(where the eye lands first, second, third, and whether that matches the intent)
+
+What works
+(1 to 2 elements you can see, each tied to a named principle)
+
+What does not work, and why
+(up to 3 issues. For each: the element, the named principle, and a concrete fix)
+
+Rules:
+- Mention ONLY things that are actually visible in the image. Never invent elements, colors, images or text. If you are not sure something is there, leave it out.
+- Only raise a principle if it applies to what you see (e.g. do not mention error red unless an error state is shown).
+- Never say "feels off" or "looks cluttered" without naming the principle.
+- Be concise and concrete. You judge craft, not brand taste.
+- If the image is not a UI screen, say so in one sentence and still critique its hierarchy and typography.
+- End with a final line that begins "Verdict:" saying whether this is low-impact (ship it and fix it yourself) or high-impact (bring in a designer), with a few words of why.
+Plain text, no markdown symbols.`;
+
+const critiqueHits = new Map(); // per-isolate rate limit: ip -> [timestamps]
+const CRITIQUE_LIMIT = 10; // per hour per IP
+const CRITIQUE_MAX_IMAGE = 3 * 1024 * 1024; // data-URL chars after client downscale
+
+async function runVision(env, payload) {
+  try {
+    return await env.AI.run(VISION_MODEL, payload);
+  } catch (err) {
+    // First use of the Llama 3.2 vision model requires accepting Meta's license once per account.
+    if (/5016|agree/i.test(String(err))) {
+      // The acceptance call itself responds with a 5016 "Thank you for agreeing" error; that is success.
+      await env.AI.run(VISION_MODEL, { prompt: 'agree' }).catch(() => {});
+      return await env.AI.run(VISION_MODEL, payload);
+    }
+    throw err;
+  }
+}
+
+async function handleCritique(request, env) {
+  if (!env.AI) return json({ error: 'Workers AI binding (AI) not configured.' }, 503);
+
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const now = Date.now();
+  const recent = (critiqueHits.get(ip) || []).filter((t) => now - t < 3600_000);
+  if (recent.length >= CRITIQUE_LIMIT) {
+    return json({ error: 'Critique limit reached (10 per hour). Try again later.' }, 429);
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const { image, intent } = body;
+  if (typeof image !== 'string' || !/^data:image\/(jpeg|png|webp);base64,/.test(image)) {
+    return json({ error: 'Send a JPEG, PNG or WebP screenshot.' }, 400);
+  }
+  if (image.length > CRITIQUE_MAX_IMAGE) return json({ error: 'Image is too large.' }, 413);
+
+  recent.push(now);
+  critiqueHits.set(ip, recent);
+
+  const stated = String(intent || '').trim().slice(0, 500);
+  const userText = stated
+    ? `The learner says this screen is trying to: ${stated}\n\nCritique it.`
+    : 'The learner did not state an intent; infer it from the screen and say so.\n\nCritique it.';
+
+  try {
+    const out = await runVision(env, {
+      messages: [
+        { role: 'system', content: CRITIQUE_SYSTEM },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: userText },
+            { type: 'image_url', image_url: { url: image } },
+          ],
+        },
+      ],
+      max_tokens: 900,
+      temperature: 0.3,
+    });
+    const critique = (out && (out.response ?? out.result?.response)) || '';
+    if (!String(critique).trim()) return json({ error: 'The model returned no critique.' }, 502);
+    // The model sometimes adds markdown despite instructions; the UI renders plain text.
+    const plain = String(critique).replace(/\*\*/g, '').replace(/^#+\s*/gm, '').replace(/^\s*[*-]\s+/gm, '• ').trim();
+    return json({ critique: plain });
   } catch (err) {
     return json({ error: 'AI request failed', detail: String(err) }, 502);
   }
@@ -254,6 +357,7 @@ export default {
     if (path.startsWith('/api/')) {
       try {
         if (path === '/api/ask' && request.method === 'POST') return handleAsk(request, env);
+        if (path === '/api/critique' && request.method === 'POST') return handleCritique(request, env);
         if (path === '/api/resources' && request.method === 'GET') return handleResources(env);
         // Suggestions — R2-backed
         if (path === '/api/suggestions' && request.method === 'POST') return handleCreateSuggestion(request, env);

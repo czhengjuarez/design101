@@ -6,6 +6,7 @@ import SlideDeck from '../components/SlideDeck';
 import CritiqueExercise from '../components/CritiqueExercise';
 import DecisionDrill from '../components/DecisionDrill';
 import AskTutor from '../components/AskTutor';
+import AICritique from '../components/AICritique';
 import DownloadCurriculum from '../components/DownloadCurriculum';
 
 type Tab = 'slides' | 'resources' | 'books' | 'practice' | 'tutor';
@@ -114,6 +115,17 @@ export default function ModulePage() {
       {/* Practice */}
       {tab === 'practice' && (
         <div className="tab-panel">
+          {mod.id === 'design-craft' && (
+            <section className="section">
+              <h2 className="section-title">AI critique · Your own screen</h2>
+              <p className="practice-intro">
+                Upload a screenshot of something you shipped or are about to. State what it is
+                trying to do, then get a critique built on the four critique questions: every
+                issue tied to a named principle, not a preference.
+              </p>
+              <AICritique />
+            </section>
+          )}
           {practice.critique.length > 0 && (
             <section className="section">
               <h2 className="section-title">Critique · Spot the issue</h2>
