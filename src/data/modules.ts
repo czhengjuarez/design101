@@ -1738,7 +1738,7 @@ export const modules: Module[] = [
     resources: [
       { title: 'Design Systems 101 (NN/g)', url: 'https://www.nngroup.com/articles/design-systems-101/', type: 'article', description: 'The clearest definition of what a system is.' },
       { title: 'Atomic Design', url: 'https://atomicdesign.bradfrost.com/', type: 'book', description: "Brad Frost's free online book on system structure." },
-      { title: 'Keel design system', url: 'https://github.com/czhengjuarez/Keel', type: 'tool', description: 'The system that powers this site (and its --of-* tokens).' },
+      { title: 'Keel design system', url: 'https://keel.coscient.workers.dev/', type: 'tool', description: 'The system that powers this site (and its --of-* tokens).' },
       { title: 'Shopify Polaris', url: 'https://polaris.shopify.com/', type: 'tool', description: 'A mature, well-documented real-world system to study.' },
     ],
     books: [

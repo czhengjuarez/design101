@@ -41,7 +41,7 @@ export default function About() {
         <strong> AI tutor</strong> you can ask anything, grounded in the curriculum.
       </p>
       <p style={{ color: 'var(--of-fg-subtle)', fontSize: 'var(--of-text-sm)' }}>
-        Built on the <a href="https://github.com/czhengjuarez/Keel" target="_blank" rel="noopener noreferrer">Keel</a> design
+        Built on the <a href="https://keel.coscient.workers.dev/" target="_blank" rel="noopener noreferrer">Keel</a> design
         system. Resources draw from a <a href="https://design-resources.coscient.workers.dev" target="_blank" rel="noopener noreferrer">living library of design resources</a>.
       </p>
     </div>
